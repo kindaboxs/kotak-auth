@@ -10,14 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
-  id              String  @id @default(uuid())
+  id              String    @id @default(uuid())
   name            String
-  email           String  @unique
-  emailVerified   Boolean @default(false)
+  email           String    @unique
+  emailVerified   Boolean   @default(false)
   image           String?
-  username        String? @unique
+  username        String?   @unique
   displayUsername String?
+  role            UserRole  @default(USER)
+  banned          Boolean?  @default(false)
+  banReason       String?
+  banExpires      DateTime?
 
   sessions Session[]
   accounts Account[]
@@ -29,12 +38,13 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(uuid())
-  userId    String
-  expiresAt DateTime
-  token     String   @unique
-  ipAddress String?
-  userAgent String?
+  id             String   @id @default(uuid())
+  userId         String
+  expiresAt      DateTime
+  token          String   @unique
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

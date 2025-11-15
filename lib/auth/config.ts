@@ -5,11 +5,13 @@ import type { BetterAuthOptions } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { username } from "better-auth/plugins";
+import { admin, username } from "better-auth/plugins";
 
 import { hashPassword, verifyPassword } from "@/lib/argon2";
+import { ac, roles } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
+import { UserRole } from "@/lib/generated/prisma/enums";
 import { getNormalizedName, getValidEmailDomains } from "@/utils";
 
 export const authConfig = {
@@ -23,6 +25,28 @@ export const authConfig = {
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const adminEmails = env.ADMIN_EMAILS.includes(user.email);
+
+          if (adminEmails) {
+            return {
+              data: {
+                ...user,
+                role: UserRole.ADMIN,
+              },
+            };
+          }
+
+          return {
+            data: user,
+          };
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
@@ -86,10 +110,27 @@ export const authConfig = {
       }
     }),
   },
-  plugins: [username(), nextCookies()],
+  plugins: [
+    username(),
+    nextCookies(),
+    admin({
+      defaultRole: UserRole.USER,
+      adminRoles: [UserRole.ADMIN],
+      ac,
+      roles: roles,
+    }),
+  ],
   secret: env.BETTER_AUTH_SECRET,
   session: {
     expiresIn: 60 * 60 * 24 * 3,
   },
   trustedOrigins: [env.NEXT_PUBLIC_APP_URL],
+  user: {
+    additionalFields: {
+      role: {
+        type: ["USER", "ADMIN"],
+        defaultValue: "USER",
+      },
+    },
+  },
 } satisfies BetterAuthOptions;

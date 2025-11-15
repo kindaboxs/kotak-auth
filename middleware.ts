@@ -7,7 +7,7 @@ const SIGN_IN_URL = "/sign-in";
 const SIGN_UP_URL = "/sign-up";
 const DEFAULT_AFTER_SIGN_IN_URL = "/profile";
 const AUTH_PATH_PREFIXES = [SIGN_IN_URL, SIGN_UP_URL];
-const PROTECTED_PATH_PREFIXES = [DEFAULT_AFTER_SIGN_IN_URL];
+const PROTECTED_PATH_PREFIXES = [DEFAULT_AFTER_SIGN_IN_URL, "/admin/dashboard"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
