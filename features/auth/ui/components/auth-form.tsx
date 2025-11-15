@@ -65,6 +65,7 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
     startTransitionSignUp(async () => {
       await authClient.signUp.email({
         name: data.name,
+        username: data.username,
         email: data.email,
         password: data.password,
         callbackURL: "/",
@@ -288,7 +289,7 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
                     disabled={isPendingSignUp}
                     type="password"
                     placeholder="********"
-                    autoComplete="new-password"
+                    autoComplete="current-password"
                   />
                   <InputGroupAddon>
                     <KeyRoundIcon />
