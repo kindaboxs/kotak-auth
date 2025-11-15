@@ -71,9 +71,11 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
         callbackURL: "/",
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Account has been created successfully.");
+            toast.success(
+              "Account has been created successfully. Please sign in."
+            );
             formSignUp.reset();
-            router.push("/profile");
+            router.push("/sign-in");
           },
 
           onError: (ctx) => {
