@@ -21,7 +21,7 @@ export const getNormalizedName = (name: string) => {
   const normalized = name
     .trim()
     .replace(/\s+/g, " ")
-    .replace(/[^a-zA-Z\s'-]/g, "")
+    .replace(/[^\p{L}\s'-]/gu, "")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 
   return normalized;

@@ -36,11 +36,36 @@ export const authConfig = {
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-up/email") {
+        if (!ctx.body.email || typeof ctx.body.email !== "string") {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Email is required and must be a string.",
+          });
+        }
+
+        if (!ctx.body.name || typeof ctx.body.name !== "string") {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Name is required and must be a string.",
+          });
+        }
+
         const email = String(ctx.body.email);
-        const domain = email.split("@")[1];
+        const emailParts = email.split("@");
+
+        if (emailParts.length !== 2 || !emailParts[1]) {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Invalid email format. Please use a valid email.",
+          });
+        }
+
+        const domain = emailParts[1].toLowerCase();
         const validDomain = getValidEmailDomains();
 
-        if (!validDomain.includes(domain)) {
+        if (
+          !validDomain.map((domain) => domain.toLowerCase()).includes(domain)
+        ) {
           throw new APIError("BAD_REQUEST", {
             code: "BAD_REQUEST",
             message: "Invalid email domain. Please use a valid email.",
