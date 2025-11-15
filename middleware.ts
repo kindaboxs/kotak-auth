@@ -6,14 +6,18 @@ import { auth } from "@/lib/auth";
 const SIGN_IN_URL = "/sign-in";
 const SIGN_UP_URL = "/sign-up";
 const DEFAULT_AFTER_SIGN_IN_URL = "/profile";
-const AUTH_PATHS = [SIGN_IN_URL, SIGN_UP_URL];
-const PROTECTED_PATHS = [DEFAULT_AFTER_SIGN_IN_URL];
+const AUTH_PATH_PREFIXES = [SIGN_IN_URL, SIGN_UP_URL];
+const PROTECTED_PATH_PREFIXES = [DEFAULT_AFTER_SIGN_IN_URL];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const isAuthRoute = AUTH_PATHS.includes(pathname);
-  const isProtectedRoute = PROTECTED_PATHS.includes(pathname);
+  const isAuthRoute = AUTH_PATH_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
+  );
+  const isProtectedRoute = PROTECTED_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + "/")
+  );
 
   const session = await auth.api.getSession({
     headers: await headers(),
