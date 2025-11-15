@@ -64,7 +64,9 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
   const onSubmitSignUp = async (data: SignUpSchema) => {
     startTransitionSignUp(async () => {
       await authClient.signUp.email({
-        ...data,
+        name: data.name,
+        email: data.email,
+        password: data.password,
         callbackURL: "/",
         fetchOptions: {
           onSuccess: () => {
@@ -86,12 +88,13 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
   const onSubmitSignIn = async (data: SignInSchema) => {
     startTransitionSignIn(async () => {
       await authClient.signIn.username({
-        ...data,
+        username: data.username,
+        password: data.password,
         callbackURL: "/",
         fetchOptions: {
           onSuccess: () => {
             toast.success("Signed in successfully.");
-            formSignUp.reset();
+            formSignIn.reset();
             router.push("/profile");
           },
 
@@ -123,7 +126,7 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     disabled={isPendingSignUp}
-                    type="name"
+                    type="text"
                     placeholder="Enter your full name"
                     autoComplete="name"
                   />
@@ -204,7 +207,7 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
                     aria-invalid={fieldState.invalid}
                     disabled={isPendingSignUp}
                     type="email"
-                    placeholder="Enter your full name"
+                    placeholder="Enter your email"
                     autoComplete="email"
                   />
                   <InputGroupAddon>

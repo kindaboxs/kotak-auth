@@ -30,7 +30,7 @@ export const SignUpView = () => {
         <CardFooter className="w-full">
           <p className="w-full text-center text-sm">
             Already have an account?{" "}
-            <Button variant="link" className="px-2">
+            <Button variant="link" className="px-2" asChild>
               <Link href="/sign-in">Sign in</Link>
             </Button>
           </p>
