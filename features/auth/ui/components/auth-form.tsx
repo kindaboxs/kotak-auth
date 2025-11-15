@@ -289,7 +289,7 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
                     disabled={isPendingSignUp}
                     type="password"
                     placeholder="********"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                   />
                   <InputGroupAddon>
                     <KeyRoundIcon />
@@ -391,7 +391,7 @@ export const AuthForm = ({ type = "sign-in" }: AuthFormProps) => {
                   disabled={isPendingSignIn}
                   type="password"
                   placeholder="********"
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                 />
                 <InputGroupAddon>
                   <KeyRoundIcon />
