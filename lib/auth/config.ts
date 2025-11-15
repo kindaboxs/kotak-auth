@@ -1,11 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { BetterAuthOptions } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { username } from "better-auth/plugins";
 
 import { hashPassword, verifyPassword } from "@/lib/argon2";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
+import { getNormalizedName, getValidEmailDomains } from "@/utils";
 
 export const authConfig = {
   appName: "kotak-auth",
@@ -27,6 +32,59 @@ export const authConfig = {
       hash: (password) => hashPassword(password),
       verify: (data) => verifyPassword(data.password, data.hash),
     },
+  },
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/sign-up/email") {
+        if (!ctx.body.email || typeof ctx.body.email !== "string") {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Email is required and must be a string.",
+          });
+        }
+
+        if (!ctx.body.name || typeof ctx.body.name !== "string") {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Name is required and must be a string.",
+          });
+        }
+
+        const email = String(ctx.body.email);
+        const emailParts = email.split("@");
+
+        if (emailParts.length !== 2 || !emailParts[1]) {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Invalid email format. Please use a valid email.",
+          });
+        }
+
+        const domain = emailParts[1].toLowerCase();
+        const validDomain = getValidEmailDomains();
+
+        if (
+          !validDomain.map((domain) => domain.toLowerCase()).includes(domain)
+        ) {
+          throw new APIError("BAD_REQUEST", {
+            code: "BAD_REQUEST",
+            message: "Invalid email domain. Please use a valid email.",
+          });
+        }
+
+        const name = getNormalizedName(ctx.body.name);
+
+        return {
+          context: {
+            ...ctx,
+            body: {
+              ...ctx.body,
+              name,
+            },
+          },
+        };
+      }
+    }),
   },
   plugins: [username(), nextCookies()],
   secret: env.BETTER_AUTH_SECRET,
