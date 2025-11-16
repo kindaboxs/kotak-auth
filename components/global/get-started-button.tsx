@@ -28,8 +28,10 @@ export const GetStartedButton = () => {
           <span
             data-role={session.user.role}
             className="size-3 animate-pulse rounded-full data-[role=ADMIN]:bg-red-500 data-[role=USER]:bg-green-500"
+            aria-label={`Role: ${session.user.role}`}
+            role="img"
           />
-          Welcome back! {session.user.name} 👋
+          Welcome back, {session.user.role} {session.user.name} 👋
         </p>
       )}
     </div>

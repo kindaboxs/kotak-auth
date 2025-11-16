@@ -9,8 +9,8 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.url(),
     ADMIN_EMAILS: z
       .string()
-      .transform((val) => val.split(";"))
-      .default([]),
+      .default("")
+      .transform((val) => (val === "" ? [] : val.split(";"))),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.url(),

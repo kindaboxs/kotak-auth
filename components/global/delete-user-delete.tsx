@@ -20,30 +20,26 @@ export const DeleteUserButton = ({ userId }: DeleteUserButtonProps) => {
 
   const onDeleteUser = async () => {
     startTransition(async () => {
-      await authClient.admin.removeUser({
+      await authClient.admin.revokeUserSessions({
         userId,
         fetchOptions: {
-          onSuccess: () => {
-            toast.success("User deleted successfully.");
-            router.refresh();
-          },
           onError: (ctx) => {
-            toast.error("Delete user failed.", {
+            toast.error("Revoke user sessions failed.", {
               description: ctx.error.message,
             });
           },
         },
       });
 
-      await authClient.admin.revokeUserSessions({
+      await authClient.admin.removeUser({
         userId,
         fetchOptions: {
           onSuccess: () => {
-            toast.success("User sessions revoked successfully.");
+            toast.success("User and sessions deleted successfully.");
             router.refresh();
           },
           onError: (ctx) => {
-            toast.error("Revoke user sessions failed.", {
+            toast.error("Delete user failed.", {
               description: ctx.error.message,
             });
           },

@@ -29,18 +29,18 @@ export const UserRoleselect = ({ userId, role }: UserRoleselectProps) => {
 
   const onRoleChange = (role: UserRole) => {
     startTransition(async () => {
-      await authClient.admin.hasPermission({
+      const { error } = await authClient.admin.hasPermission({
         permission: {
           user: ["set-role"],
         },
-        fetchOptions: {
-          onError: (ctx) => {
-            toast.error("You don't have permission.", {
-              description: ctx.error.message,
-            });
-          },
-        },
       });
+
+      if (error) {
+        toast.error("You don't have permission to update role.", {
+          description: error.message,
+        });
+        return;
+      }
 
       await authClient.admin.setRole({
         role,
@@ -50,7 +50,6 @@ export const UserRoleselect = ({ userId, role }: UserRoleselectProps) => {
             toast.success("Role updated successfully.");
             router.refresh();
           },
-
           onError: (ctx) => {
             toast.error("Failed to update role.", {
               description: ctx.error.message,
@@ -62,11 +61,7 @@ export const UserRoleselect = ({ userId, role }: UserRoleselectProps) => {
   };
 
   return (
-    <Select
-      value={role}
-      onValueChange={onRoleChange}
-      disabled={role === "ADMIN" || isPending}
-    >
+    <Select value={role} onValueChange={onRoleChange} disabled={isPending}>
       <SelectTrigger className="w-fit">
         <SelectValue placeholder="Select a role" />
       </SelectTrigger>
