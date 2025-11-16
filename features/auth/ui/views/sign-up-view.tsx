@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { SignInOauthButton } from "@/components/global/sign-in-oauth-buttons";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { AuthForm } from "@/features/auth/ui/components/auth-form";
 
 export const SignUpView = () => {
@@ -23,7 +25,15 @@ export const SignUpView = () => {
             Welcome! Create an account to get started
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          <SignInOauthButton />
+
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <Separator className="border-border border-b border-dashed bg-transparent" />
+            <p className="text-muted-foreground text-xs">or continue with</p>
+            <Separator className="border-border border-b border-dashed bg-transparent" />
+          </div>
+
           <AuthForm type="sign-up" />
         </CardContent>
 
