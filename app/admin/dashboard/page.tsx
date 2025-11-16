@@ -5,8 +5,10 @@ import {
   PlaceholderDeleteUserButton,
 } from "@/components/global/delete-user-delete";
 import { ReturnButton } from "@/components/global/return-button";
+import { UserRoleselect } from "@/components/global/user-role-select";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
+import type { UserRole } from "@/lib/generated/prisma/enums";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -75,7 +77,12 @@ export default async function DashboardPage() {
                 <td className="p-2">{user.id.slice(0, 8)}</td>
                 <td className="p-2">{user.name}</td>
                 <td className="p-2">{user.email}</td>
-                <td className="p-2 text-center">{user.role}</td>
+                <td className="flex justify-center p-2">
+                  <UserRoleselect
+                    userId={user.id}
+                    role={user.role as UserRole}
+                  />
+                </td>
                 <td className="p-2 text-center">
                   {user.role === "ADMIN" || user.id === session.user.id ? (
                     <PlaceholderDeleteUserButton />

@@ -1,11 +1,13 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth/client";
 
 interface DeleteUserButtonProps {
   userId: string;
@@ -14,8 +16,40 @@ interface DeleteUserButtonProps {
 export const DeleteUserButton = ({ userId }: DeleteUserButtonProps) => {
   const [isPending, startTransition] = useTransition();
 
+  const router = useRouter();
+
   const onDeleteUser = async () => {
-    startTransition(async () => {});
+    startTransition(async () => {
+      await authClient.admin.removeUser({
+        userId,
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("User deleted successfully.");
+            router.refresh();
+          },
+          onError: (ctx) => {
+            toast.error("Delete user failed.", {
+              description: ctx.error.message,
+            });
+          },
+        },
+      });
+
+      await authClient.admin.revokeUserSessions({
+        userId,
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("User sessions revoked successfully.");
+            router.refresh();
+          },
+          onError: (ctx) => {
+            toast.error("Revoke user sessions failed.", {
+              description: ctx.error.message,
+            });
+          },
+        },
+      });
+    });
   };
 
   return (
